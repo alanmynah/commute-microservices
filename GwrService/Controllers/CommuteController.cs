@@ -25,9 +25,16 @@ namespace GwrService.Controllers
                 case 2:
                     return "Reading";
                 default:
-                    var httpClient = new HttpClient();
                     var requestUri = $"https://localhost:5011/paddington/{id}";
-                    var result = await httpClient.GetAsync(requestUri);
+                    HttpResponseMessage result;
+                    using (var httpClientHandler = new HttpClientHandler())
+                    {
+                        httpClientHandler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => { return true; };
+                        using (var client = new HttpClient(httpClientHandler))
+                        {
+                            result = await client.GetAsync(requestUri);
+                        }
+                    }
                     return result.ToString();
             }
         }
